@@ -2,57 +2,53 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FilmBöngésző - HDMozi.hu Grid Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FilmBöngésző – RPMShare+WisePlayer</title>
   <style>
-    body { margin: 0; background: #000; color: #fff; font-family: Arial,sans-serif; }
+    body { margin: 0; background: #000; color: #fff; font-family: Arial, sans-serif; }
     header { background: #1c1c1c; padding: 20px; text-align: center; position: relative; }
     h1 { margin: 0; color: cyan; font-size: 28px; }
     #clock { position: absolute; top: 10px; right: 20px; font-size: 16px; color: cyan; }
-    #movies { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 15px; padding: 15px; }
+    #movies { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
     .movie { background: #222; border: 6px solid limegreen; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
-    .movie:hover {transform: scale(1.05); box-shadow: 0 0 32px limegreen; }
-    .movie img { width: 100%; height: 240px; object-fit: cover; border-radius: 8px 8px 0 0;}
-    .movie-title { padding:10px; text-align:center; font-size:18px; color: cyan;}
-    .movie-title small { display:block; color:orange; font-size:12px; margin-top:4px;}
-    #preloader { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:9999;}
-    .loader { border:8px solid #333; border-top:8px solid cyan; border-radius: 50%; width:50px; height:50px; animation: spin 1s linear infinite;}
+    .movie:hover { transform: scale(1.05); box-shadow: 0 0 32px limegreen; }
+    .movie img { width: 100%; height: 240px; object-fit: cover; border-radius: 8px 8px 0 0; }
+    .movie-title { padding: 10px; text-align: center; font-size: 18px; color: cyan; }
+    .movie-title small { display: block; color: orange; font-size: 12px; margin-top: 4px; }
+    #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .loader { border: 8px solid #333; border-top: 8px solid cyan; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #playerModal { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999; }
+
+    #playerModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 99999; }
     #playerModal.show { display: flex; }
-    #playerIframe, #hlsPlayer { width:96vw;max-width:900px;height:60vw;max-height:85vh;min-height:210px;border:8px solid #000;background:#181818;}
+
+    #playerIframe, #hlsPlayer { width: 96vw; max-width: 900px; height: 60vw; max-height: 85vh; min-height: 210px; border: none; background: #000; border-radius: 12px; }
     #playerIframe { display: none; }
     #hlsPlayer { display: none; }
-    #movieDesc { margin:15px auto 0 auto; padding:10px; max-width: 900px; text-align: center; color: #ccc; }
-    #closeBtn { background:darkred;color:white;border:4px solid cyan;padding:6px 32px;cursor:pointer;border-radius:6px;font-size:2rem;position:fixed;top:12px;right:8vw;z-index:10001;}
-    #loadMoreBtn { text-align:center; padding:20px;}
-    #loadMoreBtn button {padding:12px 24px;font-size:16px;background:cyan;color:black;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 10px cyan; }
-    #loadMoreBtn button:hover{background:#00ffff;box-shadow:0 0 20px cyan;}
-    header img { width:200px; height:40px; display:block; margin:0 auto; }
-    #currentMovieTitle { position:absolute; bottom:2px; left:12px;font-size:12px; color:cyan; z-index:1000;}
-    @media (max-width:650px){
-        #playerIframe, #hlsPlayer { max-width: 98vw; height:50vw; min-height:150px;}
-        header img{width:140px; height:28px;}
-        #closeBtn{right:4vw; padding:3px 14px;font-size:1.5rem;}
+
+    #movieDesc { margin: 15px auto 0 auto; padding: 10px; max-width: 900px; text-align: center; color: #ccc; }
+    #closeBtn { background: darkred; color: white; border: none; padding: 6px 32px; cursor: pointer; border-radius: 6px; font-size: 2rem; position: fixed; top: 12px; right: 8vw; z-index: 10001; }
+
+    @media (max-width: 650px) {
+      #playerIframe, #hlsPlayer { max-width: 98vw; height: 50vw; min-height: 150px; }
+      #closeBtn { right: 4vw; padding: 3px 14px; font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1><img src="https://ia600504.us.archive.org/9/items/polish-20250421-185417988/Polish_20250421_185417988.png" alt="Polish image"></h1>
+    <h1>FilmBöngésző 🎬</h1>
     <div id="clock">00:00:00</div>
   </header>
+
   <div id="movies"></div>
-  <div id="loadMoreBtn">
-    <button onclick="loadMoreMovies()">Több film betöltése</button>
-  </div>
   <div id="preloader"><div class="loader"></div></div>
+
   <div id="playerModal">
     <div id="closeBtn" onclick="closeModal()">×</div>
     <iframe id="playerIframe" allowfullscreen></iframe>
     <video id="hlsPlayer" controls autoplay></video>
     <div id="movieDesc"></div>
-    <div id="currentMovieTitle" style="display:none;"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -62,146 +58,6 @@
     let currentPage = 1;
     let hls;
 
-    function fetchMovies(page = 1) {
-      document.getElementById("preloader").style.display = "flex";
-      fetch(proxy + encodeURIComponent(baseUrl + page + "/"))
-        .then(res => res.text())
-        .then(html => {
-          const doc = new DOMParser().parseFromString(html, "text/html");
-          const items = doc.querySelectorAll("article.item.movies");
-          const container = document.getElementById("movies");
-
-          if (items.length === 0 && page === 1) {
-            container.innerHTML = "<p style='color:red;'>Nem találtunk filmeket.</p>";
-          }
-
-          items.forEach(item => {
-            const link = item.querySelector("a")?.href;
-            const image = item.querySelector("img")?.src;
-            const title = item.querySelector("h3 a")?.textContent.trim();
-            const date = item.querySelector(".data span")?.textContent.trim();
-
-            if (link && title && image) {
-              const imgSrc = proxy + encodeURIComponent(image); // Kép proxy-zása
-              const div = document.createElement("div");
-              div.className = "movie";
-              div.innerHTML = `
-                <img src="${imgSrc}" alt="${title}">
-                <div class="movie-title">${title} <small>${date || ""}</small></div>
-              `;
-              div.onclick = () => loadPlayer(link, title, imgSrc);
-              container.appendChild(div);
-            }
-          });
-
-          document.getElementById("preloader").style.display = "none";
-        })
-        .catch(err => {
-          console.error("Hiba a filmek betöltésekor:", err);
-          document.getElementById("preloader").style.display = "none";
-        });
-    }
-
-    function loadMoreMovies() {
-      currentPage += 1;
-      fetchMovies(currentPage);
-    }
-
-    function addAutoplayToSrc(src) {
-      if (src.includes("autoplay=1")) return src;
-      return src.includes("?") ? src + "&autoplay=1" : src + "?autoplay=1";
-    }
-
-    async function loadPlayer(link, title, image) {
-      document.getElementById("preloader").style.display = "flex";
-      try {
-        const html = await fetch(proxy + encodeURIComponent(link)).then(res => res.text());
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        let iframe = doc.querySelector("iframe");
-        let desc = doc.querySelector('meta[name="description"]')?.content || "Nincs leírás.";
-
-        if (!iframe) {
-          let serverButton = doc.querySelector('a.slink[data-slink], li[data-slink], button[data-slink]');
-          let serverUrl = serverButton?.getAttribute("data-slink") || serverButton?.href || null;
-          if (serverUrl) {
-            if (!serverUrl.startsWith("http")) serverUrl = "https://hdmozi.hu" + serverUrl;
-            const html2 = await fetch(proxy + encodeURIComponent(serverUrl)).then(r => r.text());
-            const doc2 = new DOMParser().parseFromString(html2, "text/html");
-            iframe = doc2.querySelector("iframe");
-          }
-        }
-
-        const iframeEl = document.getElementById("playerIframe");
-        const videoEl = document.getElementById("hlsPlayer");
-
-        if (hls) {
-          hls.destroy();
-          hls = null;
-        }
-
-        if (iframe && iframe.src) {
-          let src = iframe.src.startsWith("//") ? "https:" + iframe.src : iframe.src;
-          src = addAutoplayToSrc(src);
-
-          if (src.endsWith(".m3u8")) {
-            iframeEl.style.display = "none";
-            videoEl.style.display = "block";
-
-            if (Hls.isSupported()) {
-              hls = new Hls();
-              hls.loadSource(proxy + encodeURIComponent(src));
-              hls.attachMedia(videoEl);
-              hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                videoEl.play();
-              });
-              hls.on(Hls.Events.ERROR, (event, data) => {
-                console.error("HLS.js hiba:", data);
-                alert("Hiba történt a videó lejátszásakor.");
-              });
-            } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-              videoEl.src = proxy + encodeURIComponent(src);
-              videoEl.addEventListener("loadedmetadata", () => {
-                videoEl.play();
-              });
-            } else {
-              alert("Ez a böngésző nem támogatja a HLS videót.");
-            }
-          } else {
-            videoEl.style.display = "none";
-            videoEl.pause();
-            videoEl.src = "";
-
-            iframeEl.src = src;
-            iframeEl.style.display = "block";
-          }
-
-          document.getElementById("movieDesc").innerText = title + " – " + desc;
-          document.getElementById("currentMovieTitle").innerText = title;
-          document.getElementById("playerModal").classList.add("show");
-        } else {
-          alert("Ehhez a filmhez NINCS lejátszó iframe!");
-          document.getElementById("playerModal").classList.remove("show");
-        }
-      } catch (err) {
-        alert("Hiba történt a lejátszó betöltésekor!");
-        console.error(err);
-      }
-      document.getElementById("preloader").style.display = "none";
-    }
-
-    function closeModal() {
-      document.getElementById("playerModal").classList.remove("show");
-      document.getElementById("playerIframe").src = "";
-      if(hls){
-        hls.destroy();
-        hls = null;
-      }
-      const video = document.getElementById("hlsPlayer");
-      video.pause();
-      video.src = "";
-      video.style.display = "none";
-    }
-
     function updateClock() {
       const now = new Date();
       const h = String(now.getHours()).padStart(2, '0');
@@ -210,8 +66,110 @@
       document.getElementById("clock").textContent = `${h}:${m}:${s}`;
     }
 
-    setInterval(updateClock, 1000);
+    async function fetchMovies(page = 1) {
+      document.getElementById("preloader").style.display = "flex";
+      try {
+        const res = await fetch(proxy + encodeURIComponent(baseUrl + page + "/"));
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const items = doc.querySelectorAll("article.item.movies");
+
+        items.forEach(item => {
+          const link = item.querySelector("a")?.href;
+          const image = item.querySelector("img")?.src;
+          const title = item.querySelector("h3 a")?.textContent.trim();
+          const date = item.querySelector(".data span")?.textContent.trim();
+
+          if (link && title && image) {
+            const div = document.createElement("div");
+            div.className = "movie";
+            div.innerHTML = `<img src="${image}" alt="${title}"><div class="movie-title">${title}<small>${date || ""}</small></div>`;
+            div.onclick = () => loadPlayer(link, title);
+            document.getElementById("movies").appendChild(div);
+          }
+        });
+      } catch (err) {
+        console.error("Hiba:", err);
+      }
+      document.getElementById("preloader").style.display = "none";
+    }
+
+    async function loadPlayer(url, title) {
+      document.getElementById("preloader").style.display = "flex";
+      try {
+        const html = await fetch(proxy + encodeURIComponent(url)).then(r => r.text());
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const desc = doc.querySelector('meta[name="description"]')?.content || "Nincs leírás.";
+
+        // Keress RPMShare linket
+        const allLinks = [...doc.querySelectorAll('iframe, a[data-slink], button[data-slink]')];
+        let rpmLink = allLinks.map(el => el.src || el.href || el.getAttribute("data-slink")).find(l => l && l.includes("rpmshare.com"));
+
+        if (rpmLink) {
+          if (!rpmLink.startsWith("http")) rpmLink = "https:" + rpmLink;
+          if (rpmLink.endsWith(".m3u8")) {
+            playHLS(rpmLink);
+          } else {
+            // embed wiseplayer iframe
+            showIframe(addAutoplay(rpmLink));
+          }
+        } else {
+          alert("Nem található rpmshare link.");
+          closeModal();
+        }
+
+        document.getElementById("movieDesc").innerText = title + " – " + desc;
+        document.getElementById("playerModal").classList.add("show");
+      } catch (err) {
+        alert("Hiba történt a lejátszó betöltésekor!");
+        console.error(err);
+      }
+      document.getElementById("preloader").style.display = "none";
+    }
+
+    function addAutoplay(url) {
+      return url.includes("?") ? url + "&autoplay=1" : url + "?autoplay=1";
+    }
+
+    function showIframe(src) {
+      const iframe = document.getElementById("playerIframe");
+      const video = document.getElementById("hlsPlayer");
+      if (hls) hls.destroy();
+      iframe.src = src;
+      iframe.style.display = "block";
+      video.style.display = "none";
+      video.src = "";
+    }
+
+    function playHLS(url) {
+      const video = document.getElementById("hlsPlayer");
+      const iframe = document.getElementById("playerIframe");
+      iframe.src = "";
+      iframe.style.display = "none";
+
+      video.style.display = "block";
+      if (hls) hls.destroy();
+      if (Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(proxy + encodeURIComponent(url));
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+      } else {
+        video.src = proxy + encodeURIComponent(url);
+        video.addEventListener("loadedmetadata", () => video.play());
+      }
+    }
+
+    function closeModal() {
+      document.getElementById("playerModal").classList.remove("show");
+      document.getElementById("playerIframe").src = "";
+      const video = document.getElementById("hlsPlayer");
+      if (hls) hls.destroy();
+      video.pause(); video.src = ""; video.style.display = "none";
+    }
+
     updateClock();
+    setInterval(updateClock, 1000);
     fetchMovies(currentPage);
   </script>
 </body>
